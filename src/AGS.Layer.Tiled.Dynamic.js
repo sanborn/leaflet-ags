@@ -1,6 +1,6 @@
 // AGS.Layer.Tiled.Dynamic.js
 // Scooter Wadsworth : Sanborn Map Company
-// Modified: TileLayer.AGSDynamic.js by DTSAgile
+// Modified: TileLayer.AGSDynamic.js by DTSAgile https://github.com/dtsagile/Leaflet/blob/master/src/layer/tile/TileLayer.AGSDynamic.js
 
 L.AGS.Layer.Tiled.Dynamic = L.AGS.Layer.Tiled.extend({
   defaultParams: {
