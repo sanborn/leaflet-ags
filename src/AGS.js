@@ -1,0 +1,1 @@
+L.AGS = L.Class.extend({});

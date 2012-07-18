@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Cached Example</title>
+    <link rel="stylesheet" href="css/test_app.css" />
+    <link rel="stylesheet" href="css/leaflet.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="main">
+        <div id="map"></div>
+      </div>
+    </div>
+    <script src="../lib/leaflet.js"></script>
+    <script src="../src/AGS.js"></script>
+    <script src="../src/AGS.Layer.js"></script>
+    <script src="../src/AGS.Layer.Tiled.js"></script>
+    <script type="text/javascript">
+      window.onload = function() {
+        window.map = new L.Map('map');
+
+        var cos = new L.LatLng(38.952215, -104.789148);
+        map.setView(cos, 13);
+
+        function showTiled() {
+          var baseUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer';
+          var baseLayer = new L.AGS.Layer.Tiled(baseUrl);
+          map.addLayer(baseLayer);
+
+          var refUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer';
+          var refLayer = new L.AGS.Layer.Tiled(refUrl);
+          map.addLayer(refLayer);
+        }
+
+        showTiled();
+      };
+    </script>
+  </body>
+</html>

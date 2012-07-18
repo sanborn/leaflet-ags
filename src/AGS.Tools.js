@@ -1,0 +1,1 @@
+L.AGS.Tools = L.AGS.extend({});

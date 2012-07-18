@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Token Example</title>
+    <link rel="stylesheet" href="css/test_app.css" />
+    <link rel="stylesheet" href="css/leaflet.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="main">
+        <div id="map"></div>
+      </div>
+    </div>
+    <script src="../lib/leaflet.js"></script>
+    <script src="../src/AGS.js"></script>
+    <script src="../src/AGS.Security.js"></script>
+    <script src="../src/AGS.Layer.js"></script>
+    <script src="../src/AGS.Layer.Tiled.js"></script>
+    <script src="../src/AGS.Layer.Tiled.Dynamic.js"></script>
+    <script type="text/javascript">
+      window.onload = function() {
+        window.map = new L.Map('map');
+
+        var sj = new L.LatLng(37.543802, -107.763621);
+        map.setView(sj, 7);
+
+        var baseUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer';
+        var baseLayer = new L.AGS.Layer.Tiled(baseUrl);
+        map.addLayer(baseLayer);
+
+        function showDyn() {
+          var dynUrl = 'https://servicesbeta.esri.com/ArcGIS/rest/services/SanJuan/TrailConditions/MapServer';
+          var dynLayer = new L.AGS.Layer.Tiled.Dynamic(dynUrl, {
+            token: credentials.token.value
+          });
+
+          map.addLayer(dynLayer);
+        }
+
+        var credentials = new L.AGS.Security('https://servicesbeta.esri.com/ArcGIS', {
+          //username: 'rick',
+          //password: 'rick@esri' 
+        }, showDyn);
+      };
+    </script>
+  </body>
+</html>
