@@ -88,7 +88,7 @@ L.AGS.Tools.Identify = L.AGS.Tools.extend({
     var getJsonP = function(url, params) {
       window.parseResponse = function(response) {
         document.body.removeChild(document.getElementById('getJsonP'));
-        _t.parseResponse(response, geometry);
+        _t.findBestFeature(response, geometry);
         delete window.parseResponse;
       };
 
@@ -99,68 +99,72 @@ L.AGS.Tools.Identify = L.AGS.Tools.extend({
       document.body.appendChild(script);
     };
 
-    var renderFeature = function(response, clickGeometry) { // filter and pass to callback if available
+    var findBestFeature = function(response, clickGeometry) {
       var clickGeometry = clickGeometry.split(','),
           clickPoint = new L.LatLng(clickGeometry[1], clickGeometry[0]),
           map = _t._layer._map;
 
+      response = JSON.parse(response);
+
       if (response.results instanceof Array) {
         if (response.results.length == 1) {
-          var attrs = response.results[0].attributes,
-              geom = response.results[0].geometry,
-              content = '';
+          if (typeof _t._callback !== 'undefined') {
+            _t._callback(response.results[0]);
+          } else {
+            var attrs = response.results[0].attributes,
+                geom = response.results[0].geometry;
 
-          if (geom.hasOwnProperty('x') && geom.hasOwnProperty('y')) {
-            var point = new L.LatLng(geom.y, geom.x),
-                marker = new L.CircleMarker(point);
-            map.addLayer(marker);
-            setTimeout(function() {
-              map.removeLayer(marker);
-            }, 5000);
-          } else if (geom.hasOwnProperty('rings')) {
-            var vertices = [],
-                rings = geom['rings'];
+            if (geom.hasOwnProperty('x') && geom.hasOwnProperty('y')) {
+              var point = new L.LatLng(geom.y, geom.x),
+                  marker = new L.CircleMarker(point);
 
-            for (var i = 0, len = rings[0].length; i < len; i++) {
-              var ll = new L.LatLng(rings[0][i][1], rings[0][i][0]);
-              vertices.push(ll);
+              map.addLayer(marker);
+              setTimeout(function() {
+                map.removeLayer(marker);
+              }, 5000);
+            } else if (geom.hasOwnProperty('rings')) {
+              var vertices = [],
+                  rings = geom.rings;
+
+              for (var i = 0, len = rings[0].length; i < len; i++) {
+                var ll = new L.LatLng(rings[0][i][1], rings[0][i][0]);
+                vertices.push(ll);
+              }
+
+              var polygon = new L.Polygon(vertices);
+              map.addLayer(polygon);
+              setTimeout(function() {
+                map.removeLayer(polygon);
+              }, 5000);
             }
-
-            var polygon = new L.Polygon(vertices);
-            map.addLayer(polygon);
-            setTimeout(function() {
-              map.removeLayer(polygon);
-            }, 5000);
-          }
-
-          for (var prop in attrs) {
-            content += '<p style="font-weight:bold;display:inline;">' + prop + ':</p>&nbsp;<p style="display:inline;">' + attrs[prop] + '</p><br />';
           }
         } else if (response.results.length > 1) {
-          var closestPoint = {
-            point: null,
-            dist: 1000000
+          console.log('more than 1');
+          var bestGeom = {
+            type: null,
+            dist: 1000000,
+            index: null
           };
-          
+
           for (var i = 0, len = response.results.length; i < len; i++) {
-            console.log(response.results[i]);
             if (typeof response.results[i] !== 'undefined') {
-              var geom = response.results[i].geometry,
-                  attrs = response.results[i].attributes;
+              var attrs = response.results[i].attributes,
+                  geom = response.results[i].geometry;
 
               if (geom.hasOwnProperty('x') && geom.hasOwnProperty('y')) {
                 var point = new L.LatLng(geom.y, geom.x),
-                    dist = clickPoint.distanceTo(point);
+                    dist = point.distanceTo(clickPoint);
 
-                if (dist < closestPoint.dist) {
-                  closestPoint.point = point;
-                  closestPoint.dist = dist;
+                if (dist < bestGeom.dist) {
+                  bestGeom.type = 'point';
+                  bestGeom.dist = dist;
+                  bestGeom.index = i;
                 }
-              } else if (geom.hasOwnProperty('rings')) {
+              } else if (geom.hasOwnPropety('rings')) {
                 var vertices = [],
-                    rings = geom['rings'];
-
-                for (var j = 0, len = rings[0].length; j < len; j++) {
+                    rings = geom.rings;
+                
+                for (var j = 0, len = rings.length; j < len; j++) {
                   vertices.push(new L.LatLng(rings[0][j][1], rings[0][j][0]));
                 }
 
@@ -185,38 +189,48 @@ L.AGS.Tools.Identify = L.AGS.Tools.extend({
                 }
 
                 if (inPoly) {
-                  var polygon = new L.Polygon(vertices);
-                  map.addLayer(polygon);
-
-                  setTimeout(function() {
-                    map.removeLayer(polygon);
-                  }, 5000);
+                  bestGeom.type = 'polygon';
+                  bestGeom.index = i;
+                  break;
                 }
-              } else if (geom.hasOwnProperty('paths')) {
-                // polyline
               }
             }
+          }
+          var result = response.results[bestGeom.index];
 
-            if (closestPoint.point) {
-              var marker = new L.CircleMarker(closestPoint.point);
+          if (typeof _t._callback !== 'undefined') {
+            _t._callback(result);
+          } else {
+            var attrs = result.attributes,
+                geom = result.geometry;
+
+            if (bestGeom.type == 'point') {
+              var point = new L.LatLng(geom.y, geom.x),
+                  marker = new L.CircleMarker(point);
+
               map.addLayer(marker);
 
               setTimeout(function() {
                 map.removeLayer(marker);
               }, 5000);
+            } else if (bestGeom.type == 'polygon') {
+              var vertices = [],
+                  rings = geom.rings;
+
+              for(var i = 0, len = rings.length; i < len; i++) {
+                vertices.push(new L.LatLng(rings[0][i][1], rings[0][i][0]));
+              }
+
+              var polygon = new L.Polygon(vertices);
+
+              map.addLayer(polygon);
+
+              setTimeout(function() {
+                map.removeLayer(polygon);
+              }, 5000);
             }
           }
         }
-      }
-    };
-
-    var parseResponse = function(response, geometry) {
-      if (typeof _t._callback !== 'undefined') {
-        _t._callback(response, geometry);
-        return;
-      } else {
-        response = JSON.parse(response);
-        renderFeature(response, geometry);
       }
     };
 
@@ -227,7 +241,7 @@ L.AGS.Tools.Identify = L.AGS.Tools.extend({
         if (xhr.status == 400 || xhr.status == 0) {
           getJsonP(url, this.options);
         } else if (xhr.status == 200 || xhr.status == 302) {
-          parseResponse(xhr.responseText, geometry);
+          findBestFeature(xhr.responseText, geometry);
         }
       }
     };
