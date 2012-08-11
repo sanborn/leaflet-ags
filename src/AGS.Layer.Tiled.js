@@ -1,5 +1,5 @@
 L.AGS.Layer.Tiled = L.TileLayer.extend({
-  getTileUrl: function(tilePoint, zoom) {
+  getTileUrl: function(tilePoint) {
     var url = this._url + '/tile/{z}/{y}/{x}';
 
     if ('offset' in this.options) {
@@ -7,7 +7,7 @@ L.AGS.Layer.Tiled = L.TileLayer.extend({
     }
 
     url = url.replace('{s}', '')
-             .replace('{z}', zoom)
+             .replace('{z}', this._getZoomForUrl())
              .replace('{x}', tilePoint.x)
              .replace('{y}', tilePoint.y);
 

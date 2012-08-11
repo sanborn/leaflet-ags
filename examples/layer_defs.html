@@ -36,13 +36,15 @@
         //layerDefs['0'] = "STATUS='A'";
 
         function showDyn() {
-          var dynUrl = 'http://data.sanborn.com/ArcGIS/rest/services/LittleRock/DemoDataStack/MapServer';
-          var dynLayer = new L.AGS.Layer.Tiled.Dynamic(dynUrl, {
-            layers: [13],
-            layerDefs: {
-              '14': 'OBJECTID_1 > 15'
-            }
-          });
+          //var dynUrl = 'http://data.sanborn.com/ArcGIS/rest/services/LittleRock/DemoDataStack/MapServer';
+          //var dynLayer = new L.AGS.Layer.Tiled.Dynamic(dynUrl, {
+          //  layers: [13],
+          //  layerDefs: {
+          //    '14': 'OBJECTID_1 > 15'
+          //  }
+          //});
+
+          var dynUrl = 'http://data.sanborn.com/ArcGIS/rest/services/'
 
           map.addLayer(dynLayer);
         }
