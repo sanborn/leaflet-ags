@@ -1,1 +1,1 @@
-java -jar ~/code/js/libs/Leaflet/closure-compiler/compiler.jar --js src/AGS.js --js src/AGS.Layer.js --js src/AGS.Layer.Tiled.js --js src/AGS.Layer.Tiled.Dynamic.js --js src/AGS.Security.js --js src/AGS.Tools.js --js src/AGS.Tools.Identify.js --js_output_file dist/ags.min.js
+closure-compiler --js src/AGS.js --js src/AGS.Layer.js --js src/AGS.Layer.Tiled.js --js src/AGS.Layer.Tiled.Dynamic.js --js src/AGS.Security.js --js src/AGS.Tools.js --js src/AGS.Tools.Identify.js --js_output_file dist/ags.min.js
