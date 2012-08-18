@@ -31,7 +31,7 @@
 
         function showDyn() {
           var dynUrl = 'http://data.sanborn.com/ArcGIS/rest/services/LittleRock/EnvironmentalPermits/MapServer';
-          var dynLayer = new L.AGS.Layer.Dynamic(dynUrl, map.getBounds());
+          var dynLayer = new L.AGS.Layer.Tiled.Dynamic(dynUrl);
           map.addLayer(dynLayer);
         }
 
