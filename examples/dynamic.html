@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Dynamic (Tiled) Example</title>
+    <title>Dynamic Example</title>
     <link rel="stylesheet" href="css/test_app.css" />
     <link rel="stylesheet" href="css/leaflet.css" />
   </head>
@@ -20,22 +20,13 @@
     <script src="../src/AGS.Layer.Tiled.Dynamic.js"></script>
     <script type="text/javascript">
       window.onload = function() {
-        window.map = new L.Map('map');
-
-        var lr = new L.LatLng(34.746481, -92.289595);
-        map.setView(lr, 13);
+        window.map = L.map('map').setView([34.746481, -92.289595], 13);
 
         var baseUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer';
-        var baseLayer = new L.AGS.Layer.Tiled(baseUrl);
-        map.addLayer(baseLayer);
-
-        function showDyn() {
-          var dynUrl = 'http://data.sanborn.com/ArcGIS/rest/services/LittleRock/EnvironmentalPermits/MapServer';
-          var dynLayer = new L.AGS.Layer.Dynamic(dynUrl, map.getBounds());
-          map.addLayer(dynLayer);
-        }
-
-        showDyn();
+        L.agsTileLayer(baseUrl).addTo(map);
+        
+        var dynUrl = 'http://data.sanborn.com/ArcGIS/rest/services/LittleRock/EnvironmentalPermits/MapServer';
+        L.agsDynamicLayer(dynUrl, map.getBounds()).addTo(map);
       }
     </script>
   </body>

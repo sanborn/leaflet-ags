@@ -17,22 +17,13 @@
     <script src="../src/AGS.Layer.Tiled.js"></script>
     <script type="text/javascript">
       window.onload = function() {
-        window.map = new L.Map('map');
+        window.map = L.map('map').setView([38.952215, -104.789148], 13);
 
-        var cos = new L.LatLng(38.952215, -104.789148);
-        map.setView(cos, 13);
+        var baseUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer';
+        L.agsTileLayer(baseUrl).addTo(map);
 
-        function showTiled() {
-          var baseUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer';
-          var baseLayer = new L.AGS.Layer.Tiled(baseUrl);
-          map.addLayer(baseLayer);
-
-          var refUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer';
-          var refLayer = new L.AGS.Layer.Tiled(refUrl);
-          map.addLayer(refLayer);
-        }
-
-        showTiled();
+        var refUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer';
+        L.agsTileLayer(refUrl).addTo(map);
       };
     </script>
   </body>
