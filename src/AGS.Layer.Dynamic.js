@@ -6,7 +6,7 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     bboxSR: 102100
   },
 
-  initialize: function(url, bounds, options) {
+  initialize: function (url, bounds, options) {
     this._url = url;
     this._bounds = L.latLngBounds(bounds);
     this._layerParams = L.Util.extend({}, this.defaultParams);
@@ -25,7 +25,7 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     L.Util.setOptions(this, options);
   },
 
-  onAdd: function(map) {
+  onAdd: function (map) {
     this._map = map;
 
     if (!this._image) {
@@ -44,10 +44,10 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     }
 
     this._reset();
-    this._update();
+    //this._update();
   },
 
-  onRemove: function(map) {
+  onRemove: function (map) {
     map.getPanes().overlayPane.removeChild(this._image);
 
     map.off({
@@ -60,7 +60,7 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     }
   },
 
-  _parseLayers: function() {
+  _parseLayers: function () {
     if (typeof this._layerParams.layers === 'undefined') {
       delete this._layerParams.layerOption;
       return;
@@ -100,7 +100,7 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     }
   },
 
-  _parseLayerDefs: function() {
+  _parseLayerDefs: function () {
     if (typeof this._layerParams.layerDefs === 'undefined') {
       return;
     }
@@ -127,7 +127,7 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     this._layerParams.layerDefs = defs.join(';');
   },
 
-  _initImage: function() {
+  _initImage: function () {
     this._image = L.DomUtil.create('img', 'leaflet-image-layer');
 
     if (this._map.options.zoomAnimation && L.Browser.any3d) {
@@ -147,7 +147,7 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     });
   },
 
-  _getImageUrl: function() {
+  _getImageUrl: function () {
     var bounds = this._map.getBounds(),
         size = this._map.getSize(),
         ne = this._map.options.crs.project(bounds._northEast),
@@ -158,33 +158,55 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
 
     var url = this._url + '/export' + L.Util.getParamString(this._layerParams);
 
-    if (typeof this.options.token !== 'undefined') url = url + '&token=' + this.options.token;
+    if (typeof this.options.token !== 'undefined')
+      url = url + '&token=' + this.options.token;
 
     return url;
   },
 
-  _update: function() {
+  _update: function () {
     if (this._map._panTransition && this._map._panTransition._inProgress) return;
 
-    var topLeft = this._map.latLngToLayerPoint(this._map.getBounds().getNorthWest()),
-        size = this._map.latLngToLayerPoint(this._map.getBounds().getSouthEast())._subtract(topLeft),
-        zoom = this._map.getZoom();
-
+    var zoom = this._map.getZoom();
     if (zoom > this.options.maxZoom || zoom < this.options.minZoom) return;
 
-    this._image.style.display = 'none';
-    this._image.src = this._getImageUrl();
+    this._newImage = L.DomUtil.create('img', 'leaflet-image-layer');
 
-    L.DomUtil.setPosition(this._image, topLeft);
-    this._image.style.width = size.x + 'px';
-    this._image.style.height = size.y + 'px';
+    if (this._map.options.zoomAnimation && L.Browser.any3d) {
+      L.DomUtil.addClass(this._newImage, 'leaflet-zoom-animated');
+    } else {
+      L.DomUtil.addClass(this._newImage, 'leaflet-zoom-hide');
+    }
+
+    this._updateOpacity();
+
+    L.Util.extend(this._newImage, {
+      galleryimg: 'no',
+      onselectstart: L.Util.falseFn,
+      onmousemove: L.Util.falseFn,
+      onload: L.Util.bind(this._onNewImageLoad, this),
+      src: this._getImageUrl()
+    });
   },
 
-  _onImageLoad: function() {
-    this._image.style.display = 'block';
+  _onNewImageLoad: function () {
+    var topLeft = this._map.latLngToLayerPoint(this._map.getBounds().getNorthWest()),
+        size = this._map.latLngToLayerPoint(this._map.getBounds().getSouthEast())._subtract(topLeft);
+
+    L.DomUtil.setPosition(this._newImage, topLeft);
+    this._newImage.style.width = size.x + 'px';
+    this._newImage.style.height = size.y + 'px';
+    this._map._panes.overlayPane.appendChild(this._newImage);
+    this._map._panes.overlayPane.removeChild(this._image);
+    this._image = this._newImage;
+    this._newImage = null;
+  },
+
+  _onImageLoad: function () {
+    this.fire('load');
   }
 });
 
-L.agsDynamicLayer = function(url, bounds, options) {
+L.agsDynamicLayer = function (url, bounds, options) {
   return new L.AGS.Layer.Dynamic(url, bounds, options);
 };
