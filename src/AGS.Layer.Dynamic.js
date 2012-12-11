@@ -36,7 +36,8 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
 
     map.on({
       'viewreset': this._reset,
-      'moveend': this._update
+      'moveend': this._update,
+      'zoomend': this._zoomUpdate
     }, this);
 
     if (map.options.zoomAnimation && L.Browser.any3d) {
@@ -164,7 +165,7 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     return url;
   },
 
-  _update: function () {
+  _update: function (e) {
     if (this._map._panTransition && this._map._panTransition._inProgress) return;
 
     var zoom = this._map.getZoom();
@@ -189,9 +190,19 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     });
   },
 
+  _zoomUpdate: function (e) {
+    //console.log(e);
+    //console.log(this._image);
+    //console.log(this._newImage);
+  },
+
   _onNewImageLoad: function () {
-    var topLeft = this._map.latLngToLayerPoint(this._map.getBounds().getNorthWest()),
-        size = this._map.latLngToLayerPoint(this._map.getBounds().getSouthEast())._subtract(topLeft);
+    var bounds = this._map.getBounds(),
+        nw = L.latLng(bounds._northEast.lat, bounds._southWest.lng),
+        se = L.latLng(bounds._southWest.lat, bounds._northEast.lng);
+
+    var topLeft = this._map.latLngToLayerPoint(nw),
+        size = this._map.latLngToLayerPoint(se)._subtract(topLeft);
 
     L.DomUtil.setPosition(this._newImage, topLeft);
     this._newImage.style.width = size.x + 'px';
@@ -204,6 +215,13 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
 
   _onImageLoad: function () {
     this.fire('load');
+    //if (this._image.style.display == 'none') {
+    //  this._image.style.display = 'block';
+    //}
+  },
+
+  _reset: function () {
+    return;
   }
 });
 

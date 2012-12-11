@@ -9,7 +9,14 @@ L.AGS.Tools.Identify = L.AGS.Tools.extend({
 
   initialize: function(layer, options, callback) {
     this._layer = layer;
-    this._callback = callback;
+
+    if (typeof options === 'function') {
+      this._callback = options;
+      var options = {};
+    } else {
+      this._callback = callback;
+    }
+    
     L.Util.setOptions(this, options);
     this.parseLayerDefs();
     this.setMapExtent();
@@ -110,36 +117,8 @@ L.AGS.Tools.Identify = L.AGS.Tools.extend({
         if (response.results.length == 1) {
           if (typeof _t._callback !== 'undefined') {
             _t._callback(response.results[0]);
-          } else {
-            var attrs = response.results[0].attributes,
-                geom = response.results[0].geometry;
-
-            if (geom.hasOwnProperty('x') && geom.hasOwnProperty('y')) {
-              var point = new L.LatLng(geom.y, geom.x),
-                  marker = new L.CircleMarker(point);
-
-              map.addLayer(marker);
-              setTimeout(function() {
-                map.removeLayer(marker);
-              }, 5000);
-            } else if (geom.hasOwnProperty('rings')) {
-              var vertices = [],
-                  rings = geom.rings;
-
-              for (var i = 0, len = rings[0].length; i < len; i++) {
-                var ll = new L.LatLng(rings[0][i][1], rings[0][i][0]);
-                vertices.push(ll);
-              }
-
-              var polygon = new L.Polygon(vertices);
-              map.addLayer(polygon);
-              setTimeout(function() {
-                map.removeLayer(polygon);
-              }, 5000);
-            }
-          }
+          } // check for callback?
         } else if (response.results.length > 1) {
-          console.log('more than 1');
           var bestGeom = {
             type: null,
             dist: 1000000,
@@ -200,36 +179,7 @@ L.AGS.Tools.Identify = L.AGS.Tools.extend({
 
           if (typeof _t._callback !== 'undefined') {
             _t._callback(result);
-          } else {
-            var attrs = result.attributes,
-                geom = result.geometry;
-
-            if (bestGeom.type == 'point') {
-              var point = new L.LatLng(geom.y, geom.x),
-                  marker = new L.CircleMarker(point);
-
-              map.addLayer(marker);
-
-              setTimeout(function() {
-                map.removeLayer(marker);
-              }, 5000);
-            } else if (bestGeom.type == 'polygon') {
-              var vertices = [],
-                  rings = geom.rings;
-
-              for(var i = 0, len = rings.length; i < len; i++) {
-                vertices.push(new L.LatLng(rings[0][i][1], rings[0][i][0]));
-              }
-
-              var polygon = new L.Polygon(vertices);
-
-              map.addLayer(polygon);
-
-              setTimeout(function() {
-                map.removeLayer(polygon);
-              }, 5000);
-            }
-          }
+          } // check for callback?
         }
       }
     };

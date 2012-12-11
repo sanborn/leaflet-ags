@@ -16,33 +16,26 @@
     <script src="../src/AGS.Security.js"></script>
     <script src="../src/AGS.Layer.js"></script>
     <script src="../src/AGS.Layer.Tiled.js"></script>
-    <script src="../src/AGS.Layer.Tiled.Dynamic.js"></script>
+    <!--<script src="../src/AGS.Layer.Tiled.Dynamic.js"></script>-->
+    <script src='../src/AGS.Layer.Dynamic.js'></script>
     <script src="../src/AGS.Tools.js"></script>
     <script src="../src/AGS.Tools.Identify.js"></script>
     <script src="http://maps.stamen.com/js/tile.stamen.js"></script>
     <script type="text/javascript">
       window.onload = function() {
-        window.map = new L.Map('map');
+        window.map = L.map('map').setView([34.746481, -92.289595], 11);
 
-        var lr = new L.LatLng(34.746481, -92.289595);
-        map.setView(lr, 11);
+        var baseUrl = 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer';
+        var baseLayer = L.agsTileLayer(baseUrl).addTo(map);
 
-        var baseUrl = 'http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer';
-        var baseLayer = new L.AGS.Layer.Tiled(baseUrl);
-        map.addLayer(baseLayer);
+        var dynUrl = 'https://data.sanborn.com/ArcGIS/rest/services/LittleRock/VotingDistricts/MapServer';
+        window.dynLayer = L.agsDynamicLayer(dynUrl).addTo(map);
 
-        var dynLayer;
+        //var id = new L.AGS.Tools.Identify(dynLayer, {});
 
-        function showDyn() {
-          var dynUrl = 'http://data.sanborn.com/ArcGIS/rest/services/LittleRock/VotingDistricts/MapServer';
-          dynLayer = new L.AGS.Layer.Tiled.Dynamic(dynUrl);
-
-          map.addLayer(dynLayer);
-        }
-
-        showDyn();
-
-        var id = new L.AGS.Tools.Identify(dynLayer, null);
+        var id = new L.AGS.Tools.Identify(dynLayer, function (feature) {
+          console.log(feature);
+        });
 
         map.on('click', function(e) {
           id.execute(e.latlng.lng + ',' + e.latlng.lat);
