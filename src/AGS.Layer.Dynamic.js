@@ -52,8 +52,6 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
       this._layerParams.imageSR = sr;
     }
 
-    console.log(this._layerParams);
-
     this._reset();
     //this._update();
   },
