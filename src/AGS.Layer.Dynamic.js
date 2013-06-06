@@ -3,7 +3,8 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     format: 'png8',
     transparent: true,
     f: 'image',
-    bboxSR: 102100
+    bboxSR: 102100,
+    imageSR: 102100
   },
 
   initialize: function (url, bounds, options) {
