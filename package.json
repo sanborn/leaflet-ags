@@ -1,0 +1,14 @@
+{
+  "name": "leaflet-ags",
+  "homepage": "http://github.com/sanborn/leaflet-ags",
+  "version": "0.0.1",
+  "private": true,
+  "author": {
+    "name": "Scooter Wadsworth"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-concat": "~0.3.0"
+  }
+}
