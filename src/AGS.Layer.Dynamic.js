@@ -4,7 +4,8 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
     transparent: true,
     f: 'image',
     bboxSR: 102100,
-    imageSR: 102100
+    imageSR: 102100,
+    layers: ''
   },
 
   initialize: function (url, bounds, options) {
@@ -43,6 +44,12 @@ L.AGS.Layer.Dynamic = L.ImageOverlay.extend({
 
     if (map.options.zoomAnimation && L.Browser.any3d) {
       map.on('zoomanim', this._animateZoom, this);
+    }
+
+    if (map.options.crs && map.options.crs.code) {
+      var sr = map.options.crs.code.split(":")[1];
+      this._layerParams.bboxSR = sr;
+      this._layerParams.imageSR = sr;
     }
 
     this._reset();
