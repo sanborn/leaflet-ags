@@ -3,7 +3,7 @@ module.exports = function( grunt ) {
       uglify: {
         dist: {
           files: {
-            'dist/ags.min.js': 'dist/ags.min.js'
+            'dist/ags.min.js': 'dist/ags.js'
           }
         }
       },
@@ -19,7 +19,7 @@ module.exports = function( grunt ) {
             'src/AGS.Tools.js',
             'src/AGS.Tools.Identify.js'
           ],
-          dest: 'dist/ags.min.js'
+          dest: 'dist/ags.js'
         }
       }
     });
